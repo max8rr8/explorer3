@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Select script</title>
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="swal.css" />
+    <style>
+      #scripts {
+        width: 500px;
+        height: 280px;
+        border: black solid 1px;
+      }
+
+      .flat-button {
+        width: 248px;
+      }
+
+      #buttons {
+        margin-top: 5px;
+        width: 500px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="scripts" class="list"></div>
+
+    <div id="buttons">
+      <button class="flat-button" id="addBtn">Add</button>
+      <button class="flat-button" id="deleteBtn">Delete</button>
+    </div>
+
+    <script src="swal.js"></script>
+    <script src="common.js"></script>
+    <script>
+      const { ipcRenderer, remote } = require('electron');
+      const scriptsList = document.getElementById('scripts');
+
+      document.getElementById('addBtn').onclick = async () => {
+        let scriptName = await askText('Enter script name');
+        if (!scriptName)
+          return await errorNotify('You need to enter script name');
+
+        let file = await askForFile();
+        if (!file) return await errorNotify('You need to select file');
+        console.log(file + ' <!/> ' + scriptName);
+        ipcRenderer.send('addScript', {
+          file: file,
+          name: scriptName
+        });
+      };
+
+      document.getElementById('deleteBtn').onclick = async () => {
+        let scriptName = await askText('Enter script name');
+        if (!scriptName)
+          return await errorNotify('You need to enter script name');
+        console.log('<!/> ' + scriptName);
+        ipcRenderer.send('delScript', {
+          scriptName: scriptName
+        });
+      };
+
+      function select(scriptName) {
+        ipcRenderer.send('selectScript', scriptName);
+      }
+
+      function update(scripts) {
+        let list = scripts.map(scriptName => {
+          let res = {};
+          res.label = scriptName;
+          res.onclick = () => select(scriptName);
+          return res;
+        });
+        setClickableList(scriptsList, list);
+      }
+
+      ipcRenderer.on('updateScripts', (event, scripts) => {
+        update(scripts);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Select devices</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+      #connections {
+        width: 300px;
+        height: 100px;
+        border: black solid 1px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="connections" class="list">
+      <div class="connection" class="listEl"></div>
+    </div>
+    <script src="common.js"></script>
+    <script>
+      const { ipcRenderer } = require("electron");
+      const connectionsList = document.getElementById("connections");
+      
+      function connect(device) {
+        ipcRenderer.send("connect", device);
+      }
+
+      function update(devices) {
+        let list = devices.map(device => {
+          let res = {};
+          res.label = device.name + " (" + device.type + ")";
+          res.onclick = () => connect(device);
+          return res;
+        });
+        setClickableList(connectionsList, list);
+      }
+
+      ipcRenderer.on("update", (event, devices) => {
+        update(devices);
+      });
+    </script>
+  </body>
+</html>

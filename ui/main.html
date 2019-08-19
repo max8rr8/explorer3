@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Explorer 3</title>
+    <link rel="stylesheet" href="swal.css" />
+    <link rel="stylesheet" href="common.css" />
+    <style>
+      #fileList {
+        width: 650px;
+        height: 300px;
+        border: black solid 1px;
+      }
+
+      #path {
+        font-size: 1.2em;
+        margin-left: -15px;
+        margin-left: -15px;
+        margin-bottom: 5px;
+      }
+
+      .selected {
+        background-color: #4a4ac4 !important;
+        color: #ffffff;
+      }
+
+      .flat-button {
+        width: 160px;
+      }
+
+      #buttons1 {
+        margin-top: 5px;
+        width: 652px;
+      }
+
+      #buttons2 {
+        margin-top: 5px;
+        width: 652px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="path">----wait------</div>
+    <div id="fileList" class="list"></div>
+    <div id="buttons1">
+      <button class="flat-button" id="uploadBtn">Upload</button>
+      <button class="flat-button" id="downloadBtn">Download</button>
+      <button class="flat-button" id="removeBtn">Remove</button>
+      <button class="flat-button" id="createDirBtn">Create dir</button>
+    </div>
+
+    <div id="buttons2">
+      <button class="flat-button" id="script1">Script 1</button>
+      <button class="flat-button" id="script2">Script 2</button>
+      <button class="flat-button" id="script3">Script 3</button>
+      <button class="flat-button" id="allScriptsBtn">All scripts</button>
+    </div>
+
+    <script src="swal.js"></script>
+    <script src="common.js"></script>
+    <script async>
+      const { ipcRenderer, remote } = require('electron');
+      const pathLib = require('path');
+      const fileList = document.getElementById('fileList');
+      const pathEl = document.getElementById('path');
+
+      let selected = null;
+      let dir = '';
+
+      document.getElementById('uploadBtn').onclick = async () => {
+        let fileName = await askText('Enter file name');
+        if (!fileName) return await errorNotify('You need to enter file name');
+
+        let file = await askForFile();
+        if (!file) return await errorNotify('You need to select file');
+
+        let savePath = pathLib.join(dir, fileName);
+        console.log(file + ' -> ' + savePath);
+        showLoading('Uploading');
+        ipcRenderer.send('upload', {
+          from: file,
+          to: savePath
+        });
+      };
+
+      document.getElementById('downloadBtn').onclick = async () => {
+        if (!selected.el || selected.el.type !== 'file')
+          return await errorNotify('You need to select FILE');
+
+        let savePath = await askForPlace();
+        if (!savePath) return await errorNotify('You need to enter save place');
+
+        console.log(selected.el.fullPath + ' -> ' + savePath);
+        showLoading('Downloading');
+        ipcRenderer.send('download', {
+          from: selected.el.fullPath,
+          to: savePath
+        });
+      };
+
+      document.getElementById('removeBtn').onclick = async () => {
+        if (!selected.el) return errorNotify('You need to select something');
+
+        console.log('x ' + selected.el.fullPath);
+        showLoading('Removing');
+        ipcRenderer.send('remove', {
+          file: selected.el.fullPath
+        });
+      };
+
+      document.getElementById('createDirBtn').onclick = async () => {
+        let dirName = await askText('Enter dir name');
+        if (!dirName) return errorNotify('You need to enter dir name');
+
+        let dirPath = pathLib.join(dir, dirName + '/');
+        console.log('+ ' + dirPath);
+        showLoading('Creating');
+        ipcRenderer.send('createDir', {
+          path: dirPath
+        });
+      };
+
+      document.getElementById('allScriptsBtn').onclick = async () => {
+        ipcRenderer.send('allScripts');
+      };
+
+      function updateScript(data) {
+        for (let i = 1; i <= 3; i++) {
+          let el = document.getElementById('script' + i);
+          el.innerText = data[i - 1];
+          el.oncontextmenu = e => {
+            ipcRenderer.send('setTop', { num: i - 1 });
+          };
+          el.onclick = e => {
+            ipcRenderer.send('runTop', { num: i - 1 });
+          };
+        }
+      }
+
+      function select(el, dEl) {
+        if (selected) selected.dEl.className = 'listEl';
+        if (!selected || selected.el !== el) {
+          selected = { el, dEl };
+          dEl.className = 'listEl selected';
+        } else if (el.type == 'dir') {
+          ipcRenderer.send('goTo', el.fullPath);
+        }
+      }
+
+      function update(state) {
+        Swal.close();
+        if (state.showAlert) {
+          Swal.fire(...state.showAlert);
+        }
+        let list = state.files.map(el => {
+          let res = {};
+          if (el.type == 'dir') {
+            res.label = el.path + '/';
+          } else {
+            res.label = el.name + '  (' + el.size + ' bytes)';
+          }
+          res.onclick = dEl => select(el, dEl);
+          return res;
+        });
+        setClickableList(fileList, list);
+        dir = state.path;
+        pathEl.innerText = state.path;
+      }
+
+      ipcRenderer.on('updateState', (event, state) => {
+        update(state);
+      });
+
+      ipcRenderer.on('updateScripts', (e, script) => {
+        updateScript(script);
+      });
+    </script>
+  </body>
+</html>
