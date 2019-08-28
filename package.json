@@ -15,12 +15,13 @@
   },
   "scripts": {
     "pack": "electron-builder --dir",
-    "build:linux": "electron-builder -l deb",
+    "build:linux": "electron-builder -l deb AppImage",
     "build:mac": "electron-builder -m pkg",
     "build:win": "electron-builder -w portable",
     "download": "electron-download --version=2.0.18 --arch=x64 --platform=darwin"
   },
   "build": {
+    "artifactName": "${os}.${ext}",
     "appId": "com.electron.explorer3",
     "productName": "Explorer 3",
     "files": [
