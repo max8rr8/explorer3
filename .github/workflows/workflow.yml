@@ -1,0 +1,30 @@
+name: CI
+
+on: [release]
+
+jobs:
+  build-linux:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install bluetooth
+      run: apt-get install -y build-essential libbluetooth-dev
+    - name: Install dependencies
+      run: npm install
+    - name: Build linux
+      run: npm run build:linux  
+    - name: Upload to Release deb
+      uses: JasonEtco/upload-to-release@v0.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      with:
+        args: dist/linux.deb
+    - name: Upload to Release deb
+      uses: JasonEtco/upload-to-release@v0.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      with:
+        args: dist/linux.AppImage
+
