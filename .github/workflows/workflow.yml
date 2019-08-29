@@ -16,17 +16,13 @@ jobs:
     - name: Build linux
       run: npm run build:linux  
     - name: Upload to Release deb
-      uses: JasonEtco/upload-to-release@v0.1.1
+      run: ./upload.sh dist/linux.deb application/vnd.debian.binary-package
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-      with:
-        args: dist/linux.deb application/vnd.debian.binary-package
     - name: Upload to Release deb
-      uses: JasonEtco/upload-to-release@v0.1.1
+      run: ./upload.sh dist/linux.AppImage application/x-executable
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-      with:
-        args: dist/linux.AppImage application/x-executable
   build-mac:
     runs-on: macOS-latest
     
@@ -40,9 +36,8 @@ jobs:
     - name: Build mac
       run: npm run build:mac
     - name: Upload to Release pkg
-      uses: JasonEtco/upload-to-release@v0.1.1
+      run: ./upload.sh dist/mac.pkg application/x-xar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-      with:
-        args: dist/mac.pkg application/x-xar
+      
 
