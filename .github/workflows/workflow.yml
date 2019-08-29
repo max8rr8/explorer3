@@ -32,8 +32,9 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: Set node version
-      run: nvm use 8.16.1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '8.x'
     - name: Install dependencies
       run: npm install
     - name: Build mac
