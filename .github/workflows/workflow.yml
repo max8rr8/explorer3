@@ -32,6 +32,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: Set node version
+      run: nvm use 8.16.1
     - name: Install dependencies
       run: npm install
     - name: Build mac
