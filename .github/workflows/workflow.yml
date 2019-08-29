@@ -27,4 +27,19 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       with:
         args: dist/linux.AppImage application/x-executable
+  build-mac:
+    runs-on: macOS-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: npm install
+    - name: Build mac
+      run: npm run build:mac
+    - name: Upload to Release pkg
+      uses: JasonEtco/upload-to-release@v0.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      with:
+        args: dist/mac.pkg application/x-xar
 
