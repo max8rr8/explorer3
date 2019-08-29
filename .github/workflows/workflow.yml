@@ -16,7 +16,7 @@ jobs:
     - name: Build linux
       run: npm run build:linux  
     - name: Upload to Release deb
-      run: ./upload.sh dist/linux.deb application/vnd.debian.binary-package
+      run: bash ./upload.sh dist/linux.deb application/vnd.debian.binary-package
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
     - name: Upload to Release deb
@@ -36,7 +36,7 @@ jobs:
     - name: Build mac
       run: npm run build:mac
     - name: Upload to Release pkg
-      run: ./upload.sh dist/mac.pkg application/x-xar
+      run: bash ./upload.sh dist/mac.pkg application/x-xar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       
