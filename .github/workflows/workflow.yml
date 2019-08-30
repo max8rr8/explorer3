@@ -48,6 +48,27 @@ jobs:
         name: mac
         path: out
         
+  build-win:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '8.x'
+    - name: Install dependencies
+      run: npm install
+    - name: Build mac
+      run: npm run build:win
+    - name: Creating out
+      run: | 
+        mkdir out
+        cp dist/win.exe out/
+    - name: Upload build
+      uses: actions/upload-artifact@master
+      with:
+        name: win
+        
   upload:
     runs-on: ubuntu-latest
     needs: [build-linux, build-mac]
@@ -62,6 +83,11 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: mac
+        
+    - name: Download linux artifact
+      uses: actions/download-artifact@master
+      with:
+        name: win
       
     - name: Upload to Release deb
       uses: JasonEtco/upload-to-release@v0.1.1
