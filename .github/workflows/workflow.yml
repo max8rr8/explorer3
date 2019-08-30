@@ -55,13 +55,13 @@ jobs:
     - uses: actions/checkout@v1
     - name: Download linux artifact
       uses: actions/download-artifact@master
-        with:
-          name: linux
+      with:
+        name: linux
           
     - name: Download linux artifact
       uses: actions/download-artifact@master
-        with:
-          name: mac
+      with:
+        name: mac
       
     - name: Upload to Release deb
       uses: JasonEtco/upload-to-release@v0.1.1
