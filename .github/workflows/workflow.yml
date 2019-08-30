@@ -15,14 +15,17 @@ jobs:
       run: npm install
     - name: Build linux
       run: npm run build:linux  
-    - name: Clean
-      run: 
-        rm -rf dist/*-unpacked dist/*.yml
+    - name: Creating out
+      run: | 
+        mkdir out
+        cp dist/linux.AppImage out/
+        cp dist/linux.deb out/
+        
     - name: Upload build
       uses: actions/upload-artifact@master
       with:
         name: linux
-        path: dist
+        path: out
   build-mac:
     runs-on: macOS-latest
     
@@ -35,9 +38,10 @@ jobs:
       run: npm install
     - name: Build mac
       run: npm run build:mac
-    - name: Clean
-      run: 
-        rm -rf dist/*-unpacked dist/*.yml
+    - name: Creating out
+      run: | 
+        mkdir out
+        cp dist/mac.pkg out/
     - name: Upload build
       uses: actions/upload-artifact@master
       with:
