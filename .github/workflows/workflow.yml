@@ -63,7 +63,7 @@ jobs:
     - name: Creating out
       run: | 
         mkdir out
-        cp dist/win.exe out/
+        copy dist/win.exe out/
     - name: Upload build
       uses: actions/upload-artifact@master
       with:
