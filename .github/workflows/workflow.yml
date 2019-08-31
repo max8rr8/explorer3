@@ -58,7 +58,7 @@ jobs:
         node-version: '8.x'
     - name: Install dependencies
       run: npm install
-    - name: Build mac
+    - name: Build win
       run: npm run build:win
     - name: Creating out
       run: | 
@@ -80,12 +80,12 @@ jobs:
       with:
         name: linux
           
-    - name: Download linux artifact
+    - name: Download mac artifact
       uses: actions/download-artifact@master
       with:
         name: mac
         
-    - name: Download linux artifact
+    - name: Download win artifact
       uses: actions/download-artifact@master
       with:
         name: win
@@ -110,6 +110,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       with:
         args: mac/mac.pkg application/x-xar
+        
+    - name: Upload to Release exe
+      uses: JasonEtco/upload-to-release@v0.1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      with:
+        args: win/win.exe application/octet-stream
         
       
 
