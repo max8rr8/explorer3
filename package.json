@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "electron-builder": "^20.43.0",
-    "electron": "^2.0.18"
+    "electron": "^11.5.0"
   },
   "scripts": {
     "pack": "electron-builder --dir",
